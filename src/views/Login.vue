@@ -10,7 +10,10 @@
         <el-input type="text" v-model="formData.username"></el-input>
       </el-form-item>
       <el-form-item label="密码">
-        <el-input type="password" v-model="formData.password"></el-input>
+        <!-- 组件,有自己的事件机制,用的是vue事件机制实现的keyup事件
+        想用DOM中的keyup事件 native是告诉组件,我要使用原生的事件机制
+        -->
+        <el-input type="password" @keyup.enter.native="handleLogin" v-model="formData.password"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button class="btn" @click="handleLogin" type="primary">登录</el-button>
