@@ -11,7 +11,7 @@
           <div class="title">电商后台管理系统</div>
         </el-col>
         <el-col :span="1" class="logout">
-          <a href="#">退出</a>
+          <a href="#" @click.prevent="loginOut">退出</a>
         </el-col>
       </el-row>
     </el-header>
@@ -107,13 +107,34 @@
           </el-submenu>
        </el-menu>
       </el-aside>
-      <el-main class="main">Main</el-main>
+      <el-main class="main">
+        Main
+      </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
 export default {
+  // 判断是否登录
+  beforeCreate() {
+    var token = sessionStorage.getItem('token');
+    if (!token) {
+      // 提示
+      this.$message.warning('请先登录');
+      // 没有token跳转到登录页
+      this.$router.push('/login');
+    }
+  },
+  methods: {
+    loginOut() {
+      this.$message.success('退出登录成功');
+      // 退出登录 清除token
+      sessionStorage.clear();
+      // 跳转到登录页
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 
