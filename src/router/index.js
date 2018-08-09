@@ -4,6 +4,8 @@ import Router from 'vue-router';
 import Login from '@/views/Login';
 // 导入首页
 import Home from '@/views/Home';
+// 导入用户组件
+import User from '@/views/user/User';
 
 // @代表的是src的绝对路径
 // @是在build/webpack.base.conf.js
@@ -14,6 +16,14 @@ Vue.use(Router);
 export default new Router({
   routes: [
     { name: 'home', path: '/', component: Home },
-    { name: 'login', path: '/login', component: Login }
+    { name: 'login', path: '/login', component: Login },
+    {
+      name: 'home',
+      path: '/',
+      component: Home,
+      children: [
+        { name: 'user', path: '/user', component: User }
+      ]
+    }
   ]
 });
