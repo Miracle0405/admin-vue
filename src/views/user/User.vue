@@ -42,8 +42,11 @@
       </el-table-column>
       <el-table-column
         prop="create_time"
-        label="日期"
+        label="时间"
         width="180">
+        <template slot-scope="scope">
+          {{ scope.row.create_time | fmtDate('YYYY-MM-DD') }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="mg_state"
