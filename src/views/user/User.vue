@@ -10,17 +10,15 @@
     <!-- 搜索框 -->
     <el-row class="searchRow">
       <el-col :span="24">
-        <el-input placeholder="请输入内容" class="searchInput">
-          <el-button slot="append" icon="el-icon-search"></el-button>
+        <!-- 实现搜索功能 给表单绑定数据-->
+        <el-input placeholder="请输入内容" v-model="searchKey" class="searchInput">
+          <el-button slot="append" @click="handleSerch" icon="el-icon-search"></el-button>
         </el-input>
-        <el-button type="success" plain>成功按钮</el-button>
+        <!-- 点击添加时 弹出对话框 实现添加功能-->
+        <el-button type="success" @click="UserAdddialogFormVisible = true" plain>添加</el-button>
       </el-col>
     </el-row>
-    <!-- 表格 -->
-    <!-- stripe 加斑马线
-      border 加带边框
-      加序号
-    -->
+    <!-- 表格 stripe 加斑马线 border 加带边框 加序号-->
     <el-table
       border
       stripe
@@ -87,6 +85,29 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 对话框 -->
+    <el-dialog title="收货地址" :visible.sync="UserAdddialogFormVisible">
+      <el-form
+        :model="form"
+        label-width="100px">
+        <el-form-item label="用户名">
+          <el-input v-model="form.username" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="form.password" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="form.email" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="form.mobile" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="UserAdddialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="UserAdddialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -95,7 +116,18 @@
 export default {
   data() {
     return {
-      list: []
+      list: [],
+      // 绑定搜索框
+      searchKey: '',
+      // 绑定对话框表单
+      form: {
+        username: '',
+        password: '',
+        email: '',
+        mobile: ''
+      },
+      // 绑定对话框的显示隐藏
+      UserAdddialogFormVisible: false
     };
   },
   // 页面加载完毕发送请求,获取用户列表数据
@@ -108,7 +140,7 @@ export default {
       // 设置请求头携带token
       this.$http.defaults.headers.common['Authorization'] = token;
 
-      var response = await this.$http.get('users?pagenum=1&pagesize=10');
+      var response = await this.$http.get(`users?pagenum=1&pagesize=10&query=${this.searchKey}`);
       // console.log(response);
       // response => { data: { data: { users: [] }, meta: { status: [] } }}
       var { meta: { status, msg } } = response.data;
@@ -117,7 +149,15 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    // 搜索功能
+    handleSerch() {
+      this.loadData();
     }
+    // 添加功能
+    // handleAdd() {
+
+    // }
   }
 };
 </script>
