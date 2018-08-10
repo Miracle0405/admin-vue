@@ -63,7 +63,8 @@
           <el-switch
             v-model="scope.row.mg_state"
             active-color="#13ce66"
-            inactive-color="#ff4949">
+            inactive-color="#ff4949"
+            @change="handleUserStatus(scope.row)">
           </el-switch>
         </template>
       </el-table-column>
@@ -71,17 +72,26 @@
         label="操作">
         <template slot-scope="scope">
           <el-button
-          plain
-          size="mini"
-          type="primary" icon="el-icon-edit"></el-button>
+            plain
+            size="mini"
+            type="primary"
+            icon="el-icon-edit"
+            @click="editAdddialogSearch(scope.row)">
+          </el-button>
           <el-button
-          plain
-          size="mini"
-          type="primary" icon="el-icon-share"></el-button>
+            plain
+            size="mini"
+            type="primary"
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row)">
+          </el-button>
           <el-button
-          plain
-          size="mini"
-          type="primary" icon="el-icon-delete"></el-button>
+            plain
+            size="mini"
+            type="primary"
+            icon="el-icon-check"
+            @click="handleJuese(scope.row)">
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -109,7 +119,7 @@
         :total="count">
       </el-pagination>
     <!-- 添加用户的对话框 -->
-    <el-dialog title="收货地址" :visible.sync="UserAdddialogFormVisible">
+    <el-dialog title="添加用户" :visible.sync="UserAdddialogFormVisible">
       <el-form
         :model="form"
         label-width="100px"
@@ -132,6 +142,50 @@
         <el-button @click="UserAdddialogFormVisible = false">取 消</el-button>
         <!-- 点击确定时执行handleAdd函数 -->
         <el-button type="primary" @click="handleAdd">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 编辑用户的对话框 -->
+    <el-dialog title="修改用户" :visible.sync="editAdddialogFormVisible" @close="handleCancel">
+      <el-form
+        :model="form"
+        label-width="100px"
+        :rules="rules"
+        ref="editForm">
+        <el-form-item label="用户名"  prop="username">
+          <el-input v-model="form.username" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="form.email" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="form.mobile" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editAdddialogFormVisible = false">取 消</el-button>
+        <!-- 点击确定时执行handleEdit函数 -->
+        <el-button type="primary" @click="handleEdit(form.id)">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 分配角色的对话框 -->
+    <el-dialog title="分配角色" :visible.sync="dialogFormVisible">
+      <el-form label-width="100">
+        <el-form-item label="当前用户">{{ currentName }}</el-form-item>
+        <el-form-item label="请选择角色">
+          <el-select v-model="currentRoleId">
+            <el-option label="请选择" :value="-1" disabled></el-option>
+            <el-option
+              v-for="item in juese"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleJueseMake">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -169,7 +223,19 @@ export default {
         password: [
           { required: true, message: '请选择密码', trigger: 'blur' }
         ]
-      }
+      },
+      // 绑定修改用户对话框的显示隐藏
+      editAdddialogFormVisible: false,
+      // 分配角色的对话框
+      dialogFormVisible: false,
+      // 当前用户
+      currentName: '',
+      // 当前用户id
+      currentUserId: -1,
+      // 分配角色的列表
+      juese: [],
+      // 角色id
+      currentRoleId: -1
     };
   },
   // 页面加载完毕发送请求,获取用户列表数据
@@ -241,6 +307,109 @@ export default {
         // 添加失败
         this.$message.error('添加失败');
       }
+    },
+    // 当点击编辑按钮时
+    async editAdddialogSearch(user) {
+      // 显示编辑对话框
+      this.editAdddialogFormVisible = true;
+      // 发送请求 显示用户当前点击编辑的这条数据
+      const response = await this.$http.get(`users/${user.id}`);
+      console.log(response.data.data);
+      if (response.data.meta.status === 200) {
+        this.form = response.data.data;
+      }
+    },
+    // 用户点击编辑对话框的确认按钮时
+    async handleEdit(id) {
+      // console.log(id);
+      // 发送请求
+      const response = await this.$http.put(`users/${id}`, this.form);
+      if (response.data.meta.status === 200) {
+        // 提示修改成功
+        this.$message.success(response.data.meta.msg);
+        // 重新加载页面
+        this.loadData();
+        // 编辑用户的对话框隐藏
+        this.editAdddialogFormVisible = false;
+        // // 清空表单数据
+        // for (var item in this.form) {
+        //   this.form[item] = '';
+        // }
+      }
+    },
+    // 当用户点击编辑对话框的取消按钮时
+    handleCancel() {
+      // 编辑用户的对话框隐藏
+      this.editAdddialogFormVisible = false;
+      // 清空表单内容
+      for (var item in this.form) {
+        this.form[item] = '';
+      }
+    },
+    // 当用户点击编辑对话框的X按钮时
+    // 当用户点击删除按钮时
+    async handleDelete(user) {
+      this.$confirm('确认要删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const response = await this.$http.delete(`users/${user.id}`);
+        // console.log(response);
+        if (response.data.meta.status === 200) {
+          // 判断当前页数据是不是只有一条 并且 不是第一页
+          if (this.list.length === 1 && this.pagenum !== 1) {
+            // 如果是 就pagenum--
+            this.pagenum--;
+            this.loadData();
+          }
+
+          // 提示删除成功
+          this.$message.success(response.data.meta.msg);
+          this.loadData();
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+      // console.log(user);
+    },
+    // 当开关点击时 修改用户状态
+    async handleUserStatus(user) {
+      // console.log(user);
+      const response = await this.$http.put(`users/${user.id}/state/${user.status}`);
+      console.log(response);
+      if (response.data.meta.status === 200) {
+        // 提示修改状态成功
+        this.$message.success(response.data.meta.msg);
+      }
+    },
+    // 当用户点击角色分配时
+    async handleJuese(user) {
+      this.dialogFormVisible = true;
+      // console.log(user);
+      this.currentName = user.username;
+      // 请求角色列表
+      this.currentUserId = user.id;
+      // console.log(user.id);
+
+      const response = await this.$http.get('/roles');
+      console.log(response.data.data);
+      if (response.data.meta.status === 200) {
+        // 获取成功
+        this.juese = response.data.data;
+        // 角色Id
+        // this.currentRoleId
+      } else {
+        this.$messate.warning(response.data.meta.msg);
+      }
+    },
+    // 当用户点击分配角色确定按钮时
+    async handleJueseMake() {
+      this.dialogFormVisible = false;
+      // const response = await this.$http.put(`users/${this.currentUserId}/role`)
     }
   }
 };
