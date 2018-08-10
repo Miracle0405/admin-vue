@@ -24,7 +24,7 @@
 
 <script>
 // 导入axios
-import axios from 'axios';
+// import axios from 'axios';
 
 export default {
   data() {
@@ -37,8 +37,8 @@ export default {
   },
   methods: {
     handleLogin() {
-      axios
-        .post('http://localhost:8888/api/private/v1/login', this.formData)
+      this.$http
+        .post('login', this.formData)
         .then((response) => {
           console.log(response);
           if (response.data.meta.status === 200) {

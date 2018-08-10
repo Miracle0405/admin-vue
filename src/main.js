@@ -10,6 +10,11 @@ import 'element-ui/lib/theme-chalk/index.css';
 // 导入全局样式css
 import '@/assets/css/index.css';
 import moment from 'moment';
+import axios from 'axios';
+
+// 全局的axios默认值
+axios.defaults.baseURL = 'http://localhost:8888/api/private/v1/';
+Vue.prototype.$http = axios;
 
 // 注册组件
 Vue.use(ElementUI);

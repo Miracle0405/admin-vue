@@ -22,6 +22,7 @@
       加序号
     -->
     <el-table
+      border
       stripe
       :data="list"
       style="width: 100%">
@@ -33,11 +34,16 @@
       <el-table-column
         prop="username"
         label="姓名"
-        width="180">
+        width="150">
       </el-table-column>
       <el-table-column
         prop="email"
         label="邮箱"
+        width="<18></18>0">
+      </el-table-column>
+      <el-table-column
+        prop="mobile"
+        label="电话"
         width="180">
       </el-table-column>
       <el-table-column
@@ -45,6 +51,8 @@
         label="时间"
         width="180">
         <template slot-scope="scope">
+          <!-- 过滤器只可以在 插值表达式 和 v-bind 中使用 -->
+          <!-- {{ scope.row }} 当前这行绑定的数据-->
           {{ scope.row.create_time | fmtDate('YYYY-MM-DD') }}
         </template>
       </el-table-column>
@@ -83,7 +91,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
 export default {
   data() {
     return {
@@ -91,17 +99,24 @@ export default {
     };
   },
   // 页面加载完毕发送请求,获取用户列表数据
-  async created() {
-    var token = sessionStorage.getItem('token');
-    // 设置请求头携带token
-    axios.defaults.headers.common['Authorization'] = token;
+  created() {
+    this.loadData();
+  },
+  methods: {
+    async loadData() {
+      var token = sessionStorage.getItem('token');
+      // 设置请求头携带token
+      this.$http.defaults.headers.common['Authorization'] = token;
 
-    var response = await axios.get('http://localhost:8888/api/private/v1/users?pagenum=1&pagesize=10');
-    console.log(response);
-    if (response.data.meta.status === 200) {
-      this.list = response.data.data.users;
-    } else {
-      this.$message.error(response.data.meta.msg);
+      var response = await this.$http.get('users?pagenum=1&pagesize=10');
+      // console.log(response);
+      // response => { data: { data: { users: [] }, meta: { status: [] } }}
+      var { meta: { status, msg } } = response.data;
+      if (status === 200) {
+        this.list = response.data.data.users;
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
