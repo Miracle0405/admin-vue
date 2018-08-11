@@ -1,11 +1,12 @@
 <template>
   <el-card class="card">
     <!-- 面包屑组件 -->
-    <el-breadcrumb separator-class="el-icon-arrow-right">
+    <my-bread level1="权限管理" level2="角色列表"></my-bread>
+    <!-- <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
-    </el-breadcrumb>
+    </el-breadcrumb> -->
     <!-- 表格 -->
     <el-table
       :data="data"
