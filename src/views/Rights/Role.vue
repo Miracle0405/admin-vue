@@ -105,6 +105,7 @@
       <!-- 树形控件
         :data表示树形绑定的数据-->
       <el-tree
+        ref="tree"
         :data="treeData"
         :props="defaultProps"
         default-expand-all
@@ -114,7 +115,7 @@
       </el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="RoleDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="RoleDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="handleSetRights">确 定</el-button>
       </span>
     </el-dialog>
   </el-card>
@@ -136,6 +137,8 @@ export default {
         // 设置数的子节点的属性
         children: 'children'
       },
+      // 当前角色id
+      currentRoleId: -1,
       // 给数绑定当前角色的权限
       checkedList: []
     };
@@ -172,13 +175,15 @@ export default {
     },
     // 当点击分配角色按钮时 获取角色权限列表
     async OpenRoleDialogRights(role) {
-      console.log(role);
+      // console.log(role);
       // 清空数组
       this.checkedList = [];
 
       this.RoleDialogVisible = true;
       const response2 = await this.$http.get(`rights/tree`);
       this.treeData = response2.data.data;
+      // 为当前角色id赋值
+      this.currentRoleId = role.id;
 
       // 帮当前角色的Id存储到checkedList中
       role.children.forEach((level1) => {
@@ -188,6 +193,34 @@ export default {
           });
         });
       });
+    },
+    // 当点击确定按钮时分配角色
+    async handleSetRights() {
+      this.RoleDialogVisible = false;
+      // 角色id  this.currentRoleId
+      // 权限列表id
+      // 全选的节点的id
+      const checkedList = this.$refs.tree.getCheckedKeys();
+      // 半选的节点的id
+      const halfCheckedList = this.$refs.tree.getHalfCheckedKeys();
+
+      const arr = [...checkedList, ...halfCheckedList];
+
+      // 发送请求
+      const response = await this.$http.post(`roles/${this.currentRoleId}/rights`, {
+        rids: arr.join(',')
+      });
+      // console.log(response);
+      // 判断是否成功
+      // const { meta: { status, msg } } = response.data;
+      if (response.data.meta.status === 200) {
+        // 提示分配成功信息
+        this.$message.success(response.data.meta.msg);
+        // 关闭对话框
+        this.RoleDialogVisible = false;
+        // 重新加载数据
+        this.loadData();
+      }
     }
   }
 };
