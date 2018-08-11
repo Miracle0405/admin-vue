@@ -40,7 +40,7 @@ export default {
       this.$http
         .post('login', this.formData)
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           if (response.data.meta.status === 200) {
             // 登录成功
             // 记录token

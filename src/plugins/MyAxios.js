@@ -15,12 +15,12 @@ Myplugin.install = function (Vue) {
   // 添加请求拦截器
   axios.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
-    console.log(config);
+    // console.log(config);
     // console.log(config.url); 路由的标识
     if (config.url.toLocaleString() !== 'login') {
       var token = sessionStorage.getItem('token');
       // 全局设置请求头携带token
-      axios.defaults.headers.common['Authorization'] = token;
+      config.headers.common['Authorization'] = token;
     }
     return config;
   }, function (error) {

@@ -55,7 +55,7 @@ export default {
     async loadData() {
       // 发送权限列表的请求
       const response = await this.$http.get(`rights/${this.type}`);
-      console.log(response);
+      // console.log(response);
       if (response.data.meta.status === 200) {
         this.data = response.data.data;
       } else {
