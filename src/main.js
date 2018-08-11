@@ -9,14 +9,18 @@ import 'element-ui/lib/theme-chalk/index.css';
 // 导入全局样式css
 import '@/assets/css/index.css';
 import moment from 'moment';
-import axios from 'axios';
+// import axios from 'axios';
 // 导入面包屑组件
 import myBread from '@/components/myBread';
+// 导入自定义的vue插件
+import MyAxios from '@/plugins/MyAxios';
 
-// 全局的axios默认值
-axios.defaults.baseURL = 'http://localhost:8888/api/private/v1/';
-Vue.prototype.$http = axios;
+// // 全局的axios默认值
+// axios.defaults.baseURL = 'http://localhost:8888/api/private/v1/';
+// Vue.prototype.$http = axios;
 
+// 使用插件
+Vue.use(MyAxios);
 // 注册组件
 Vue.use(ElementUI);
 
