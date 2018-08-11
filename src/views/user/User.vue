@@ -240,9 +240,9 @@ export default {
   },
   methods: {
     async loadData() {
-      var token = sessionStorage.getItem('token');
-      // 设置请求头携带token
-      this.$http.defaults.headers.common['Authorization'] = token;
+      // var token = sessionStorage.getItem('token');
+      // // 设置请求头携带token
+      // this.$http.defaults.headers.common['Authorization'] = token;
 
       var response = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}&query=${this.searchKey}`);
       // console.log(response);

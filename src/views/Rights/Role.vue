@@ -89,7 +89,7 @@ export default {
     async loadData() {
       // 获取角色列表数据
       const response = await this.$http.get('roles');
-      console.log(response);
+      // console.log(response);
       if (response.data.meta.status === 200) {
         this.data = response.data.data;
       } else {
