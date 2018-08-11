@@ -17,6 +17,7 @@
         <template slot-scope="scope">
           <!-- 一级权限 -->
           <el-row
+            class="elRow"
             v-for="level1 in scope.row.children"
             :key="level1.id">
             <el-col :span="4">
@@ -25,7 +26,32 @@
                 {{ level1.authName}}
               </el-tag>
             </el-col>
-            <el-col :span="20"></el-col>
+            <el-col :span="20">
+              <!-- 二级权限 -->
+              <el-row
+                v-for="level2 in level1.children"
+                :key="level2.id">
+                <el-col :span="4">
+                  <!-- 显示二级权限的名称 -->
+                  <el-tag
+                    closable
+                    type="success">
+                    {{ level2.authName}}
+                  </el-tag>
+                </el-col>
+                <el-col :span="20">
+                  <!-- 三级权限 -->
+                  <el-tag
+                    class="level3"
+                    v-for="level3 in level2.children"
+                    :key="level3.id"
+                    type="warning"
+                    closable>
+                    {{ level3.authName }}
+                  </el-tag>
+                </el-col>
+              </el-row>
+            </el-col>
           </el-row>
         </template>
       </el-table-column>
@@ -84,7 +110,7 @@ export default {
     async loadData() {
       // 获取角色列表数据
       const response = await this.$http.get('roles');
-      console.log(response);
+      // console.log(response);
       if (response.data.meta.status === 200) {
         this.data = response.data.data;
       } else {
@@ -98,6 +124,13 @@ export default {
 <style>
 .table {
   margin-top: 10px;
+  margin-bottom: 10px;
+}
+.level3 {
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+.elRow {
   margin-bottom: 10px;
 }
 </style>
