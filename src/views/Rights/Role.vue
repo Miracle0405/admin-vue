@@ -92,7 +92,7 @@
             size="mini"
             type="primary"
             icon="el-icon-check"
-            @click="OpenRoleDialogRights">
+            @click="OpenRoleDialogRights(scope.row)">
           </el-button>
         </template>
       </el-table-column>
@@ -108,7 +108,9 @@
         :data="treeData"
         :props="defaultProps"
         default-expand-all
-        show-checkbox>
+        show-checkbox
+        node-key="id"
+        :default-checked-keys="checkedList">
       </el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="RoleDialogVisible = false">取 消</el-button>
@@ -133,7 +135,9 @@ export default {
         label: 'authName',
         // 设置数的子节点的属性
         children: 'children'
-      }
+      },
+      // 给数绑定当前角色的权限
+      checkedList: []
     };
   },
   created() {
@@ -167,11 +171,24 @@ export default {
       }
     },
     // 当点击分配角色按钮时 获取角色权限列表
-    async OpenRoleDialogRights() {
+    async OpenRoleDialogRights(role) {
+      console.log(role);
+      // 清空数组
+      this.checkedList = [];
+
       this.RoleDialogVisible = true;
       const response2 = await this.$http.get(`rights/tree`);
       this.treeData = response2.data.data;
-     }
+
+      // 帮当前角色的Id存储到checkedList中
+      role.children.forEach((level1) => {
+        level1.children.forEach((level2) => {
+          level2.children.forEach((level3) => {
+            this.checkedList.push(level3.id);
+          });
+        });
+      });
+    }
   }
 };
 </script>
