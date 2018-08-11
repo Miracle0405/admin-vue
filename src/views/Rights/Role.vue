@@ -91,11 +91,30 @@
             plain
             size="mini"
             type="primary"
-            icon="el-icon-check">
+            icon="el-icon-check"
+            @click="OpenRoleDialogRights">
           </el-button>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分配权限的对话框 -->
+    <el-dialog
+      title="分配权限"
+      :visible.sync="RoleDialogVisible"
+      width="30%">
+      <!-- 树形控件
+        :data表示树形绑定的数据-->
+      <el-tree
+        :data="treeData"
+        :props="defaultProps"
+        default-expand-all
+        show-checkbox>
+      </el-tree>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="RoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="RoleDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </el-card>
 
 </template>
@@ -104,7 +123,17 @@
 export default {
   data() {
     return {
-      data: []
+      data: [],
+      // 绑定分配权限对话框的显示与隐藏
+      RoleDialogVisible: false,
+      // 树形图绑定的数据
+      treeData: [],
+      defaultProps: {
+        // 设置节点对象上显示的对象
+        label: 'authName',
+        // 设置数的子节点的属性
+        children: 'children'
+      }
     };
   },
   created() {
@@ -136,7 +165,13 @@ export default {
       } else {
         this.$message.error(response1.data.meta.msg);
       }
-    }
+    },
+    // 当点击分配角色按钮时 获取角色权限列表
+    async OpenRoleDialogRights() {
+      this.RoleDialogVisible = true;
+      const response2 = await this.$http.get(`rights/tree`);
+      this.treeData = response2.data.data;
+     }
   }
 };
 </script>
