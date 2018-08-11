@@ -395,21 +395,33 @@ export default {
       this.currentUserId = user.id;
       // console.log(user.id);
 
+      // 显示角色列表（下拉框）
       const response = await this.$http.get('/roles');
-      console.log(response.data.data);
-      if (response.data.meta.status === 200) {
-        // 获取成功
-        this.juese = response.data.data;
-        // 角色Id
-        // this.currentRoleId
-      } else {
-        this.$messate.warning(response.data.meta.msg);
-      }
+      // 获取成功
+      this.juese = response.data.data;
+      console.log(response);
+
+      // 角色id
+      // 根据id查询用户信息
+      const rolResponse = await this.$http.get(`users/${user.id}`);
+      // console.log(rolResponse);
+      this.currentRoleId = rolResponse.data.data.rid;
     },
     // 当用户点击分配角色确定按钮时
     async handleJueseMake() {
-      this.dialogFormVisible = false;
-      // const response = await this.$http.put(`users/${this.currentUserId}/role`)
+      // this.dialogFormVisible = false;
+      const response = await this.$http.put(`users/${this.currentUserId}/role`, {
+        rid: this.currentRoleId
+      });
+      console.log(response);
+      if (response.data.meta.status === 200) {
+        // 提示分配成功
+        this.$message.success(response.data.meta.msg);
+        // 关闭分配角色对话框
+        this.dialogFormVisible = false;
+      } else {
+        this.$message.error(response.data.meta.msg);
+      }
     }
   }
 };

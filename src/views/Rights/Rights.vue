@@ -1,0 +1,70 @@
+<template>
+  <el-card class="card">
+    <!-- 面包屑组件 -->
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 表格 -->
+    <el-table
+      :data="data"
+      style="width: 100%"
+      class="table">
+      <!-- 加序号 -->
+      <el-table-column
+        type="index"
+        width="50">
+      </el-table-column>
+      <el-table-column
+        prop="authName"
+        label="权限名称"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="path"
+        label="路径"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="level"
+        label="层级">
+      </el-table-column>
+    </el-table>
+  </el-card>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      data: [],
+      // 请求全新列表参数
+      type: 'list'
+    };
+  },
+  created() {
+    this.loadData();
+  },
+  methods: {
+    async loadData() {
+      // 发送权限列表的请求
+      const response = await this.$http.get(`rights/${this.type}`);
+      console.log(response);
+      if (response.data.meta.status === 200) {
+        this.data = response.data.data;
+      } else {
+        this.$message.error(response.data.meta.msg);
+      }
+    }
+  }
+};
+</script>
+
+<style>
+.table {
+  /*overflow: hidden;*/
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+</style>
