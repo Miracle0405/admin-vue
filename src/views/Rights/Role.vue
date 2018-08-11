@@ -22,7 +22,9 @@
             :key="level1.id">
             <el-col :span="4">
               <!-- 显示一级权限的名称 -->
-              <el-tag closable>
+              <el-tag
+                closable
+                @close="handleClose(scope.row, level1.id)">
                 {{ level1.authName}}
               </el-tag>
             </el-col>
@@ -35,7 +37,8 @@
                   <!-- 显示二级权限的名称 -->
                   <el-tag
                     closable
-                    type="success">
+                    type="success"
+                    @close="handleClose(scope.row, level2.id)">
                     {{ level2.authName}}
                   </el-tag>
                 </el-col>
@@ -46,7 +49,8 @@
                     v-for="level3 in level2.children"
                     :key="level3.id"
                     type="warning"
-                    closable>
+                    closable
+                    @close="handleClose(scope.row, level3.id)">
                     {{ level3.authName }}
                   </el-tag>
                 </el-col>
@@ -115,6 +119,22 @@ export default {
         this.data = response.data.data;
       } else {
         this.$message.error(response.data.meta.msg);
+      }
+    },
+    // 当点击动态编辑标签的关闭按钮时,删除角色指定权限
+    async handleClose(role, rightId) {
+      // 角色Id role.id
+      // 权限Id rightId
+      const response1 = await this.$http.delete(`roles/${role.id}/rights/${rightId}`);
+      // console.log(response1);
+      if (response1.data.meta.status === 200) {
+        // 提示删除权限成功
+        this.$message.success(response1.data.meta.msg);
+        // this.loadData(); 重新调用loadData()用户体验不好 展开行会关闭
+        // 所以只需要将当前绑定的数据重新赋值即可
+        role.children = response1.data.data;
+      } else {
+        this.$message.error(response1.data.meta.msg);
       }
     }
   }
