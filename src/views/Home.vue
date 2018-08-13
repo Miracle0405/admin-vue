@@ -127,13 +127,13 @@ export default {
   },
   // 判断是否登录
   beforeCreate() {
-    var token = sessionStorage.getItem('token');
-    if (!token) {
-      // 提示
-      this.$message.warning('请先登录');
-      // 没有token跳转到登录页
-      this.$router.push('/login');
-    }
+    // var token = sessionStorage.getItem('token');
+    // if (!token) {
+    //   // 提示
+    //   this.$message.warning('请先登录');
+    //   // 没有token跳转到登录页
+    //   this.$router.push('/login');
+    // }
   },
   created() {
     // 加载菜单数据
@@ -150,7 +150,7 @@ export default {
     // 发送不同权限用户登录进来看到不同的导航菜单的请求
     async loginUserRights() {
       const response = await this.$http.get('menus');
-      console.log(response);
+      // console.log(response);
       this.data = response.data.data;
     }
   }
