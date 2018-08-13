@@ -23,25 +23,30 @@
         unique-opened = true 只能一个子菜单展开
         router 是否使用 vue-router 的模式，启用该模式会在激活导航时以 index 作为 path 进行路由跳转
         -->
+        <!-- 由于不同权限的用户登录进来看到的导航菜单是不同的，所以需要动态生成导航菜单 -->
         <el-menu
           unique-opened
           router
           class="aside-menu">
           <!-- 用户管理 -->
-          <el-submenu index="1">
+          <el-submenu
+            v-for="item in data"
+            :key="item.id"
+            :index="item.id + ''">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>用户管理</span>
+              <span>{{ item.authName }}</span>
             </template>
-            <el-menu-item-group>
-              <el-menu-item index="user">
-                <i class="el-icon-menu"></i>
-                用户列表
-              </el-menu-item>
-            </el-menu-item-group>
+            <el-menu-item
+              v-for="item1 in item.children"
+              :key="item1.id"
+              :index="item1.path + ''">
+              <i class="el-icon-menu"></i>
+              {{ item1.authName }}
+            </el-menu-item>
           </el-submenu>
           <!-- 权限管理 -->
-          <el-submenu index="2">
+          <!-- <el-submenu index="2">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>权限管理</span>
@@ -56,9 +61,9 @@
                 权限列表
               </el-menu-item>
             </el-menu-item-group>
-          </el-submenu>
+          </el-submenu> -->
           <!-- 商品管理 -->
-          <el-submenu index="3">
+         <!--  <el-submenu index="3">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>商品管理</span>
@@ -77,9 +82,9 @@
                 商品分类
               </el-menu-item>
             </el-menu-item-group>
-          </el-submenu>
+          </el-submenu> -->
           <!-- 订单管理 -->
-          <el-submenu index="4">
+         <!--  <el-submenu index="4">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>商品管理</span>
@@ -90,9 +95,9 @@
                 订单列表
               </el-menu-item>
             </el-menu-item-group>
-          </el-submenu>
+          </el-submenu> -->
           <!-- 数据统计 -->
-          <el-submenu index="5">
+          <!-- <el-submenu index="5">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>商品管理</span>
@@ -103,7 +108,7 @@
                 数据报表
               </el-menu-item>
             </el-menu-item-group>
-          </el-submenu>
+          </el-submenu> -->
        </el-menu>
       </el-aside>
       <el-main class="main">
@@ -115,6 +120,11 @@
 
 <script>
 export default {
+  data() {
+    return {
+      data: []
+    };
+  },
   // 判断是否登录
   beforeCreate() {
     var token = sessionStorage.getItem('token');
@@ -125,6 +135,10 @@ export default {
       this.$router.push('/login');
     }
   },
+  created() {
+    // 加载菜单数据
+    this.loginUserRights();
+  },
   methods: {
     loginOut() {
       this.$message.success('退出登录成功');
@@ -132,6 +146,12 @@ export default {
       sessionStorage.clear();
       // 跳转到登录页
       this.$router.push('/login');
+    },
+    // 发送不同权限用户登录进来看到不同的导航菜单的请求
+    async loginUserRights() {
+      const response = await this.$http.get('menus');
+      console.log(response);
+      this.data = response.data.data;
     }
   }
 };
