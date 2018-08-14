@@ -5,7 +5,7 @@
     <!-- 按钮 -->
     <el-row class="row">
       <el-col :span="24">
-        <el-button type="success" plain>添加分类</el-button>
+        <el-button @click="addOpenDialogFormVisible = true" type="success" plain>添加分类</el-button>
       </el-col>
     </el-row>
 
@@ -77,6 +77,40 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+    <!-- 添加分类的对话框 -->
+    <el-dialog title="添加商品分类" :visible.sync="addOpenDialogFormVisible">
+      <el-form
+        :model="form"
+        label-width="100px">
+        <el-form-item label="分类名称">
+          <el-input v-model="form.cat_name" auto-complete="off" placeholder="请选择分类名称"></el-input>
+        </el-form-item>
+        <el-form-item label="分类列表">
+          <!-- 级联选择器 -->
+          <!-- expand-trigger="hover" hover触发子菜单
+            @change 绑定的值发生变化时 触发事件
+            options 绑定的数据
+            v-model 数据双向绑定
+            change-on-select 选择即改变 允许用户选择任意级选项
+            props 设置下拉框中显示数据源中哪个属性的值-->
+          <el-cascader
+            expand-trigger="hover"
+            :options="options"
+            v-model="catIds"
+            :props="defaultProps"
+            change-on-select>
+          </el-cascader>
+         <!--  <el-select v-model="form.region" placeholder="请选择活动区域">
+            <el-option label="区域一" value="shanghai"></el-option>
+            <el-option label="区域二" value="beijing"></el-option>
+          </el-select> -->
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addOpenDialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addOpenDialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -96,7 +130,26 @@ export default {
       pagesize: 5,
       // 一共有多少条数据
       total: 0,
-      loading: true
+      loading: true,
+      // 添加商品分类对话框的显示 隐藏
+      addOpenDialogFormVisible: false,
+      // 添加商品分类对话框绑定的数据
+      form: {
+        cat_pid: -1,
+        cat_name: '',
+        cat_level: 0
+      },
+      // 绑定多级选择器需要的数据
+      options: [],
+      defaultProps: {
+        // value 下拉框的隐含值
+        value: 'cat_id',
+        // label 下拉框要显示的值的属性名称
+        label: 'cat_name',
+        // children  多级下拉
+        children: 'children'
+      },
+      catIds: []
     };
   },
   created() {
