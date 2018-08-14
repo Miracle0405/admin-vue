@@ -17,6 +17,11 @@ import Params from '@/views/goods/Params';
 // 导入商品分类组件
 import Shops from '@/views/goods/Shop';
 import { Message } from 'element-ui';
+// 导入
+import ElTreeGrid from 'element-tree-grid';
+// var ElTreeGrid = require('element-tree-grid');
+// 注册组件ElTreeGrid
+Vue.component('elementTree', ElTreeGrid);
 
 // @代表的是src的绝对路径
 // @是在build/webpack.base.conf.js

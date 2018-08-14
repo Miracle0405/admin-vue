@@ -18,11 +18,11 @@
       <el-table-column
         prop="cat_name"
         label="分类名称"
-        width="180">
+        width="300">
       </el-table-column>
       <el-table-column
         label="级别"
-        width="180">
+        width="200">
         <template slot-scope="scope">
           <span v-if="scope.row.cat_level === 0">一级</span>
           <span v-if="scope.row.cat_level === 1">二级</span>
@@ -30,7 +30,8 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="是否有效">
+        label="是否有效"
+        width="200">
         <template slot-scope="scope">
           {{ scope.row.cat_deleted === false ? '无效' : '有效' }}
         </template>
@@ -54,6 +55,17 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pagenum"
+      :page-sizes="[2, 4, 6, 8]"
+      :page-size="pagesize"
+      :pager-count="5"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </el-card>
 </template>
 
@@ -61,22 +73,41 @@
 export default {
   data() {
     return {
-      data: []
+      data: [],
+      // 绑定分页的页码
+      pagenum: 1,
+      // 绑定分页的每页几条
+      pagesize: 5,
+      // 一共有多少条数据
+      total: 0
     };
   },
   created() {
     this.loadData();
   },
   methods: {
+    // 加载数据
     async loadData() {
-      const response = await this.$http.get('categories?type=3');
+      const response = await this.$http.get(`categories?type=3&pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
       console.log(response);
       const { meta: { msg, status } } = response.data;
       if (status === 200) {
-        this.data = response.data.data;
+        this.data = response.data.data.result;
+        // 为总页数赋值
+        this.total = response.data.data.total;
       } else {
         this.$message.error(msg);
       }
+    },
+    // 当每页条数发生变化时
+    handleSizeChange(val) {
+      this.pagesize = val;
+      this.loadData();
+    },
+    // 当页码数发生变化时
+    handleCurrentChange(val) {
+      this.pagenum = val;
+      this.loadData();
     }
   }
 };
