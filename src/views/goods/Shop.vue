@@ -5,7 +5,7 @@
     <!-- 按钮 -->
     <el-row class="row">
       <el-col :span="24">
-        <el-button @click="addOpenDialogFormVisible = true" type="success" plain>添加分类</el-button>
+        <el-button @click="addOpenDialogForm" type="success" plain>添加分类</el-button>
       </el-col>
     </el-row>
 
@@ -94,6 +94,8 @@
             change-on-select 选择即改变 允许用户选择任意级选项
             props 设置下拉框中显示数据源中哪个属性的值-->
           <el-cascader
+            placeholder="默认添加一级分类"
+            clearable
             expand-trigger="hover"
             :options="options"
             v-model="catIds"
@@ -181,6 +183,19 @@ export default {
     handleCurrentChange(val) {
       this.pagenum = val;
       this.loadData();
+    },
+    // 点击添加商品分类的按钮
+    async addOpenDialogForm() {
+      // 打开对话框
+      this.addOpenDialogFormVisible = true;
+      // 获取下拉框中的数据
+      const response = await this.$http.get('categories');
+      this.options = response.data.data;
+      // 请求参数
+      // cat_pid 分类父id
+      // cat_name 分类名称
+      // cat_level 分类层级
+      // const response = await this.$http.post('categories');
     }
   }
 };
