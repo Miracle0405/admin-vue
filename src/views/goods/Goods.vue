@@ -10,7 +10,8 @@
           <el-button slot="append" icon="el-icon-search"></el-button>
         </el-input>
         <!-- 点击添加时 弹出对话框 实现添加功能-->
-        <el-button type="success" plain>添加</el-button>
+        <el-button type="success" @click="$router.push('/goods/add')" plain>添加</el-button>
+        <!-- <a href="goods/add" class="el-button el-button--success is-plain" type="success" plain>添加</a> -->
       </el-col>
     </el-row>
     <!-- 表格 -->
@@ -41,7 +42,7 @@
         label="创建时间"
         width="150">
         <template slot-scope="scope">
-          {{ add_time | fmtDate('YYYY-MM-DD') }}
+          {{ scope.row.add_time | fmtDate('YYYY-MM-DD') }}
         </template>
       </el-table-column>
       <el-table-column
