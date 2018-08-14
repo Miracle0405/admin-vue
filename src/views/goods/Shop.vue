@@ -61,7 +61,8 @@
             plain
             size="mini"
             type="primary"
-            icon="el-icon-delete">
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row.cat_id)">
           </el-button>
         </template>
       </el-table-column>
@@ -165,7 +166,7 @@ export default {
       const response = await this.$http.get(`categories?type=3&pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
       // 加载完数据 转圈消失
       this.loading = false;
-      console.log(response);
+      // console.log(response);
       const { meta: { msg, status } } = response.data;
       if (status === 200) {
         this.data = response.data.data.result;
@@ -207,15 +208,15 @@ export default {
       this.form.cat_level = this.catIds.length;
       // this.catIds 绑定多级选择器的值，是一个数组
       if (this.catIds.length === 0) {
-        this.form.cat_id = 0;
+        this.form.cat_pid = 0;
       } else if (this.catIds.length === 1) {
-        this.form.cat_id = this.catIds[0];
+        this.form.cat_pid = this.catIds[0];
       } else if (this.catIds.length === 2) {
-        this.form.cat_id = this.catIds[1];
+        this.form.cat_pid = this.catIds[1];
       }
       // cat_pid 分类父id 添加的分类的父节点的id
       const response = await this.$http.post('categories', this.form);
-      // console.log(response);
+      console.log(response);
       const { meta: { msg, status } } = response.data;
       if (status === 201) {
         // 添加成功
@@ -226,6 +227,31 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    // 当点击删除按钮时 删除当前分类
+    handleDelete(id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        // 确认删除
+        // 提示删除成功
+        const response = await this.$http.delete(`categories/${id}`);
+
+        const { meta: { msg, status } } = response.data;
+        if (status === 200) {
+          this.$message.success(msg);
+          // 重新加载数据
+          this.loadData();
+          // console.log(response);
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     }
   }
 };
