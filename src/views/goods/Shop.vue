@@ -14,7 +14,8 @@
       :data="data"
       style="width: 100%"
       border
-      stripe>
+      stripe
+      v-loading="loading">
       <el-table-column
         prop="cat_name"
         label="分类名称"
@@ -79,7 +80,8 @@ export default {
       // 绑定分页的每页几条
       pagesize: 5,
       // 一共有多少条数据
-      total: 0
+      total: 0,
+      loading: true
     };
   },
   created() {
@@ -88,7 +90,10 @@ export default {
   methods: {
     // 加载数据
     async loadData() {
+      this.loading = true;
       const response = await this.$http.get(`categories?type=3&pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
+      // 加载完数据 转圈消失
+      this.loading = false;
       console.log(response);
       const { meta: { msg, status } } = response.data;
       if (status === 200) {
