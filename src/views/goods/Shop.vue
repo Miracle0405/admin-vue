@@ -55,7 +55,8 @@
             plain
             size="mini"
             type="primary"
-            icon="el-icon-edit">
+            icon="el-icon-edit"
+            @click="openEditDialog(scope.row.cat_id)">
           </el-button>
           <el-button
             plain
@@ -115,6 +116,20 @@
         <el-button type="primary" @click="handleAdd">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 编辑分类的对话框 -->
+    <el-dialog title="编辑商品分类" :visible.sync="editOpenDialogFormVisible">
+      <el-form
+        :model="form"
+        label-width="100px">
+        <el-form-item label="分类名称">
+          <el-input v-model="form.cat_name" auto-complete="off" placeholder="请选择分类名称"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editOpenDialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleEdit">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -153,7 +168,10 @@ export default {
         // children  多级下拉
         children: 'children'
       },
-      catIds: []
+      catIds: [],
+      // 绑定编辑分类的对话框
+      editOpenDialogFormVisible: false,
+      cat_id: -1
     };
   },
   created() {
@@ -252,6 +270,30 @@ export default {
           message: '已取消删除'
         });
       });
+    },
+    // 当点击编辑按钮时 弹出对话框
+    async openEditDialog(id) {
+      this.cat_id = id;
+      this.editOpenDialogFormVisible = true;
+      const response = await this.$http.get(`categories/${id}`);
+      // console.log(response);
+      this.form = response.data.data;
+    },
+    // 当点击编辑对话框的确定按钮时
+    async handleEdit() {
+      // 获取文本框数据 发送编辑的请求
+      const response = await this.$http.put(`categories/${this.cat_id}`, {
+        cat_name: this.form.cat_name
+      });
+      // console.log(response);
+      const { meta: { status, msg } } = response.data;
+      if (status === 200) {
+        this.$message.success(msg);
+        this.loadData();
+        this.editOpenDialogFormVisible = false;
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
