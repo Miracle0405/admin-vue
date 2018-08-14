@@ -10,17 +10,27 @@
     </el-row>
 
     <!-- 表格 -->
+    <!-- treegrid 表格的每一个列都改为el-table-tree-column
+    treeKey 每一个列的一个标识
+    levelKey 自分类相对于父分类有一个缩进
+    childKey
+    parentKe
+    -->
     <el-table
       :data="data"
       style="width: 100%"
       border
       stripe
       v-loading="loading">
-      <el-table-column
+      <el-table-tree-column
         prop="cat_name"
         label="分类名称"
-        width="300">
-      </el-table-column>
+        width="300"
+        treeKey="cat_id"
+        levelKey="cat_level"
+        childKey="children"
+        parentKey="cat_pid">
+      </el-table-tree-column>
       <el-table-column
         label="级别"
         width="200">
@@ -71,7 +81,12 @@
 </template>
 
 <script>
+// 加载tree组件-局部组件
+import ElTreeGrid from 'element-tree-grid';
 export default {
+  components: {
+    'el-table-tree-column': ElTreeGrid
+  },
   data() {
     return {
       data: [],
