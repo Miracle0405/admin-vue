@@ -71,7 +71,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="pagenum"
-      :page-sizes="[2, 4, 6, 8]"
+      :page-sizes="[6, 8, 10, 12]"
       :page-size="pagesize"
       :pager-count="5"
       layout="total, sizes, prev, pager, next, jumper"
@@ -93,6 +93,7 @@
             v-model 数据双向绑定
             change-on-select 选择即改变 允许用户选择任意级选项
             props 设置下拉框中显示数据源中哪个属性的值-->
+            <!-- {{ catIds }} 绑定的选中的id的集合-->
           <el-cascader
             placeholder="默认添加一级分类"
             clearable
@@ -110,7 +111,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addOpenDialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addOpenDialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="handleAdd">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -191,11 +192,40 @@ export default {
       // 获取下拉框中的数据
       const response = await this.$http.get('categories');
       this.options = response.data.data;
-      // 请求参数
-      // cat_pid 分类父id
-      // cat_name 分类名称
-      // cat_level 分类层级
+    },
+    // 点击对话框的添加按钮 实现添加分类
+    async handleAdd() {
       // const response = await this.$http.post('categories');
+      // cat_name 分类名称 绑定的文本框
+
+      // cat_level 分类层级 添加分类的等级
+      // 一级分类的level为 0
+      // 二级分类的level为 1
+      // 三级分类的level为 2
+
+      // 设置级别
+      this.form.cat_level = this.catIds.length;
+      // this.catIds 绑定多级选择器的值，是一个数组
+      if (this.catIds.length === 0) {
+        this.form.cat_id = 0;
+      } else if (this.catIds.length === 1) {
+        this.form.cat_id = this.catIds[0];
+      } else if (this.catIds.length === 2) {
+        this.form.cat_id = this.catIds[1];
+      }
+      // cat_pid 分类父id 添加的分类的父节点的id
+      const response = await this.$http.post('categories', this.form);
+      // console.log(response);
+      const { meta: { msg, status } } = response.data;
+      if (status === 201) {
+        // 添加成功
+        this.$message.success(msg);
+        // 关闭对话框
+        this.addOpenDialogFormVisible = false;
+        this.loadData();
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
