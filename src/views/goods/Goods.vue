@@ -125,4 +125,11 @@ export default {
   margin-top: 10px;
   margin-bottom: 10px;
 }
+.el-table .cell {
+  /*强制不换行*/
+  white-space: nowrap;
+  overflow: hidden;
+  /*当文字溢出时显示...*/
+  text-overflow: ellipsis;
+}
 </style>
