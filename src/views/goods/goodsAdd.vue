@@ -68,6 +68,7 @@
             v-for="item in dynamicParams"
             :label="item.attr_name"
             :key="item.attr_id">
+            {{ item.params }}
             <el-checkbox-group v-model="item.params">
               <el-checkbox
               v-for="param in item.params"
@@ -204,7 +205,13 @@ export default {
         this.dynamicParams.map((item) => {
           // 给对象添加一个属性
           // 判断attr_vals中是否有值 有值的话以，分隔为数组
-          item.params = item.attr_vals.length === 0 ? [] : item.attr_vals.split(',');
+
+          // 动态给属性添加成员 无法做双向绑定
+          // item.params = item.attr_vals.length === 0 ? [] : item.attr_vals.split(',');
+
+          const arr = item.attr_vals.length === 0 ? [] : item.attr_vals.split(',');
+
+          this.$set(item, 'params', arr);
         });
       } else if (sel === 'only') {
         // 给静态参数赋值
