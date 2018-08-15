@@ -14,20 +14,50 @@
       </el-col>
     </el-row>
     <!-- 步骤条
-    :active 设置当前激活步骤 0
+    :active="active" 数值类型 表示已完成步骤
     -->
-    <el-steps :active="0" align-center finish-status="success">
+    <el-steps
+      :active="active"
+      align-center
+      finish-status="success">
       <el-step title="基本信息"></el-step>
       <el-step title="商品参数"></el-step>
       <el-step title="商品属性"></el-step>
       <el-step title="商品图片"></el-step>
       <el-step title="商品内容"></el-step>
     </el-steps>
+    <!-- 选项卡切换
+      @tab-click 点击tab栏时触发
+    -->
+    <el-tabs
+      @tab-click="handleClick"
+      tab-position="left"
+      style="margin-top:20px">
+      <el-tab-pane label="用户管理">用户管理</el-tab-pane>
+      <el-tab-pane label="配置管理">配置管理</el-tab-pane>
+      <el-tab-pane label="角色管理">角色管理</el-tab-pane>
+      <el-tab-pane label="定时任务补偿">定时任务补偿</el-tab-pane>
+    </el-tabs>
   </el-card>
 </template>
 
 <script>
-
+export default {
+  data() {
+    return {
+      // 激活的步骤条
+      active: 0
+    };
+  },
+  methods: {
+    // 点击tab栏时 tab栏的选项卡与上面的步骤条要对应起来
+    handleClick(tab, event) {
+      // console.log(tab);  index: '1'
+      // console.log(event);
+      this.active = tab.index - 0;
+    }
+  }
+};
 </script>
 
 <style>
