@@ -102,14 +102,27 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-tab-pane>
-        <el-tab-pane label="商品图片">商品图片</el-tab-pane>
+        <el-tab-pane label="商品图片">
+          <el-button type="primary">添加商品</el-button>
+          <quill-editor></quill-editor>
+        </el-tab-pane>
       </el-tabs>
     </el-form>
   </el-card>
 </template>
 
 <script>
+// 导入父文本框
+import 'quill/dist/quill.core.css';
+import 'quill/dist/quill.snow.css';
+import 'quill/dist/quill.bubble.css';
+
+import { quillEditor } from 'vue-quill-editor';
+
 export default {
+  components: {
+    quillEditor
+  },
   data() {
     return {
       // 激活的步骤条
@@ -125,7 +138,11 @@ export default {
         // 商品的数量
         goods_number: '',
         // 商品的分类
-        goods_cat: ''
+        goods_cat: '',
+        // 记录上传图片的临时路径
+        pics: [],
+        goods_introduce: '',
+        attrs: []
       },
       // 绑定下拉框的数据源
       options: [],
@@ -219,12 +236,33 @@ export default {
       }
     },
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      // console.log(file, fileList);
+      // 移除图片时从数组中移出
+      // 要知道删除图片的索引是多少
+      const index = this.form.pics.findIndex((item) => {
+        if (item.pic === file.response.data.tmp_path) {
+          return true;
+        }
+      });
+
+      this.form.pics.splice(index, 1);
+
+      console.log(this.form.pics);
     },
     handleSuccess(response, file, fileList) {
       console.log(response);
-      console.log(file);
-      console.log(fileList);
+      // console.log(file);
+      // console.log(fileList);
+      if (response.meta.status === 200) {
+        // 上传成功
+        this.$message.success(response.meta.msg);
+        // 在pics中记录当前图片的临时路径
+        this.form.pics.push({
+          pic: response.data.tmp_path
+        });
+      } else {
+        this.$message.warning(response.meta.msg);
+      }
     }
   }
 };
@@ -237,5 +275,8 @@ export default {
 }
 .el-step__title {
   font-size: 12px;
+}
+.ql-editor {
+  height: 400px;
 }
 </style>
