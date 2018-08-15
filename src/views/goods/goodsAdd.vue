@@ -69,7 +69,10 @@
             :label="item.attr_name"
             :key="item.attr_id">
             <el-checkbox-group>
-              <el-checkbox label="复选框 A" border></el-checkbox>
+              <el-checkbox
+              v-for="param in item.params"
+              :key="param"
+              :label="param" border></el-checkbox>
             </el-checkbox-group>
           </el-form-item>
         </el-tab-pane>
@@ -162,6 +165,13 @@ export default {
       console.log(response);
       // 给动态参数赋值
       this.dynamicParams = response.data.data;
+      // 由于多选框中的值在 attr_vals:'aa,bb,cc';
+      // 需要把attr_vals的值变为数组 挂载到动态参数dynamicParams上
+      this.dynamicParams.map((item) => {
+        // 给对象添加一个属性
+        // 判断attr_vals中是否有值 有值的话以，分隔为数组
+        item.params = item.attr_vals.length === 0 ? [] : item.attr_vals.split(',');
+      });
     }
   }
 };
