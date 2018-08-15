@@ -29,49 +29,55 @@
     <!-- 选项卡切换
       @tab-click 点击tab栏时触发
     -->
-    <el-tabs
-      @tab-click="handleClickTab"
-      tab-position="left"
-      style="margin-top:20px">
-      <el-tab-pane label="基本信息">
-        <el-form
-          label-position="top"
-          label-width="80px"
-          :model="form">
-          <el-form-item label="商品名称">
-            <el-input v-model="form.goods_name"></el-input>
+    <el-form label-position="top" label-width="80px" v-model="form">
+      <el-tabs
+        @tab-click="handleClickTab"
+        tab-position="left"
+        style="margin-top:20px">
+        <el-tab-pane label="基本信息">
+            <el-form-item label="商品名称">
+              <el-input v-model="form.goods_name"></el-input>
+            </el-form-item>
+            <el-form-item label="商品价格">
+              <el-input v-model="form.goods_price"></el-input>
+            </el-form-item>
+            <el-form-item label="商品重量">
+              <el-input v-model="form.goods_weight"></el-input>
+            </el-form-item>
+            <el-form-item label="商品数量">
+              <el-input v-model="form.goods_number"></el-input>
+            </el-form-item>
+            <el-form-item label="商品分类">
+              <!-- 下拉框
+              :props 下拉框隐含的值
+              :options 数据源
+              -->
+              {{ selectedOptions2 }}
+              <el-cascader
+                @change="handleChange"
+                clearable
+                expand-trigger="hover"
+                :props="props"
+                :options="options"
+                v-model="selectedOptions2">
+              </el-cascader>
+            </el-form-item>
+        </el-tab-pane>
+        <el-tab-pane label="商品参数">
+          <el-form-item
+            v-for="item in dynamicParams"
+            :label="item.attr_name"
+            :key="item.attr_id">
+            <el-checkbox-group>
+              <el-checkbox label="复选框 A" border></el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
-          <el-form-item label="商品价格">
-            <el-input v-model="form.goods_price"></el-input>
-          </el-form-item>
-          <el-form-item label="商品重量">
-            <el-input v-model="form.goods_weight"></el-input>
-          </el-form-item>
-          <el-form-item label="商品数量">
-            <el-input v-model="form.goods_number"></el-input>
-          </el-form-item>
-          <el-form-item label="商品分类">
-            <!-- 下拉框
-            :props 下拉框隐含的值
-            :options 数据源
-            -->
-            {{ selectedOptions2 }}
-            <el-cascader
-              @change="handleChange"
-              clearable
-              expand-trigger="hover"
-              :props="props"
-              :options="options"
-              v-model="selectedOptions2">
-            </el-cascader>
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
-      <el-tab-pane label="商品参数">商品参数</el-tab-pane>
-      <el-tab-pane label="商品属性">商品属性</el-tab-pane>
-      <el-tab-pane label="商品图片">商品图片</el-tab-pane>
-      <el-tab-pane label="商品图片">商品图片</el-tab-pane>
-    </el-tabs>
+        </el-tab-pane>
+        <el-tab-pane label="商品属性">商品属性</el-tab-pane>
+        <el-tab-pane label="商品图片">商品图片</el-tab-pane>
+        <el-tab-pane label="商品图片">商品图片</el-tab-pane>
+      </el-tabs>
+    </el-form>
   </el-card>
 </template>
 
@@ -103,7 +109,11 @@ export default {
         children: 'children'
       },
       // 绑定下拉框选中值
-      selectedOptions2: []
+      selectedOptions2: [],
+      // 动态参数
+      dynamicParams: [],
+      // 静态参数
+      staicParams: []
     };
   },
   created() {
@@ -117,10 +127,14 @@ export default {
       this.active = tab.index - 0;
 
       // 判断当前点击的tab栏是不是商品参数，商品属性
-      if(tab.index === '1' || tab.index === '2') {
+      if (tab.index === '1' || tab.index === '2') {
         // 判断基本信息中的多级菜单是不是选择了3级分类
-        if(this.selectedOptions2.length !== 3) {
+        if (this.selectedOptions2.length !== 3) {
           this.$message.warning('请选择第3级分类');
+          // 加载商品参数的数据
+        } else {
+          // 只有选择了第3级分类 才加载动态参数
+          this.loadParams();
         }
       }
     },
@@ -140,9 +154,14 @@ export default {
       // console.log(response);
       this.options = response.data.data;
     },
-    // 加载商品参数的数据
-    async shopParams() {
-      // const response = await this.$http.
+    // 加载动态参数
+    async loadParams() {
+      // :id 分类id
+      // attr_sel [only,many] only-->静态 many --> 动态
+      const response = await this.$http.get(`categories/${this.selectedOptions2[2]}/attributes?sel=many`);
+      console.log(response);
+      // 给动态参数赋值
+      this.dynamicParams = response.data.data;
     }
   }
 };
