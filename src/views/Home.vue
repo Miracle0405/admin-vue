@@ -40,7 +40,7 @@
             <el-menu-item
               v-for="item1 in item.children"
               :key="item1.id"
-              :index="item1.path + ''">
+              :index="'/' + item1.path">
               <i class="el-icon-menu"></i>
               {{ item1.authName }}
             </el-menu-item>

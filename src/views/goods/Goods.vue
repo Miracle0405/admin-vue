@@ -97,7 +97,7 @@ export default {
     // 加载数据
     async loadData() {
       const response = await this.$http.get(`goods?pagenum=${this.pagenum}&pagesize=${this.pagesize}&query=${this.searchKey}`);
-      console.log(response);
+      // console.log(response);
       this.tableData = response.data.data.goods;
       this.total = response.data.data.total;
     },
