@@ -68,15 +68,23 @@
             v-for="item in dynamicParams"
             :label="item.attr_name"
             :key="item.attr_id">
-            <el-checkbox-group>
+            <el-checkbox-group v-model="item.params">
               <el-checkbox
               v-for="param in item.params"
               :key="param"
-              :label="param" border></el-checkbox>
+              :label="param"
+              border></el-checkbox>
             </el-checkbox-group>
           </el-form-item>
         </el-tab-pane>
-        <el-tab-pane label="商品属性">商品属性</el-tab-pane>
+        <el-tab-pane label="商品属性">
+          <el-form-item
+            v-for="item1 in staicParams"
+            :key="item1.attr_id"
+            :label="item1.attr_name">
+            <el-input v-model="item1.attr_vals"></el-input>
+          </el-form-item>
+        </el-tab-pane>
         <el-tab-pane label="商品图片">商品图片</el-tab-pane>
         <el-tab-pane label="商品图片">商品图片</el-tab-pane>
       </el-tabs>
@@ -137,7 +145,8 @@ export default {
           // 加载商品参数的数据
         } else {
           // 只有选择了第3级分类 才加载动态参数
-          this.loadParams();
+          // 由于下面需要判断index === 2 时加载静态属性 所以以实参的形式传过去
+          this.loadParams(tab.index);
         }
       }
     },
@@ -158,20 +167,30 @@ export default {
       this.options = response.data.data;
     },
     // 加载动态参数
-    async loadParams() {
+    async loadParams(index) {
+      // 当index === '1' 时动态参数  index === '2' 时静态参数
+      const sel = index === '1' ? 'many' : 'only';
       // :id 分类id
       // attr_sel [only,many] only-->静态 many --> 动态
-      const response = await this.$http.get(`categories/${this.selectedOptions2[2]}/attributes?sel=many`);
+      const response = await this.$http.get(`categories/${this.selectedOptions2[2]}/attributes?sel=${sel}`);
       console.log(response);
-      // 给动态参数赋值
-      this.dynamicParams = response.data.data;
-      // 由于多选框中的值在 attr_vals:'aa,bb,cc';
-      // 需要把attr_vals的值变为数组 挂载到动态参数dynamicParams上
-      this.dynamicParams.map((item) => {
-        // 给对象添加一个属性
-        // 判断attr_vals中是否有值 有值的话以，分隔为数组
-        item.params = item.attr_vals.length === 0 ? [] : item.attr_vals.split(',');
-      });
+      console.log(sel);
+      // 判断如果是动态参数 给动态参数赋值
+      if (sel === 'many') {
+        // 动态参数
+        // 给动态参数赋值
+        this.dynamicParams = response.data.data;
+        // 由于多选框中的值在 attr_vals:'aa,bb,cc';
+        // 需要把attr_vals的值变为数组 挂载到动态参数dynamicParams上
+        this.dynamicParams.map((item) => {
+          // 给对象添加一个属性
+          // 判断attr_vals中是否有值 有值的话以，分隔为数组
+          item.params = item.attr_vals.length === 0 ? [] : item.attr_vals.split(',');
+        });
+      } else if (sel === 'only') {
+        // 给静态参数赋值
+        this.staicParams = response.data.data;
+      }
     }
   }
 };
