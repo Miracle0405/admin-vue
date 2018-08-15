@@ -57,7 +57,7 @@
             -->
             {{ selectedOptions2 }}
             <el-cascader
-              change-on-select
+              @change="handleChange"
               clearable
               expand-trigger="hover"
               :props="props"
@@ -116,11 +116,25 @@ export default {
       // console.log(event);
       this.active = tab.index - 0;
     },
+    // 多级下拉选中项变化的时候执行
+    handleChange() {
+      // 多级下拉只能选中第三项
+      if (this.selectedOptions2.length !== 3) {
+        // 提示请选择第三级选项
+        this.$message.warning('请选择第三级选项');
+        // 清空多级下拉框中的内容
+        this.selectedOptions2.length = 0;
+      }
+    },
     // 加载下拉框的选项值
     async selectionOption() {
       const response = await this.$http.get('categories?type=3');
       // console.log(response);
       this.options = response.data.data;
+    },
+    // 加载商品参数的数据
+    async shopParams() {
+      // const response = await this.$http.
     }
   }
 };
