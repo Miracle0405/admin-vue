@@ -85,7 +85,22 @@
             <el-input v-model="item1.attr_vals"></el-input>
           </el-form-item>
         </el-tab-pane>
-        <el-tab-pane label="商品图片">商品图片</el-tab-pane>
+        <el-tab-pane label="商品图片">
+          <!-- 上传图片
+            action 上传图片的地址 此处必须写上全部地址
+            这是用element-ui上传图片的 需要设置请求头token --- 属性headers 对象形式
+            :on-success 图片上传成功执行的方法 有三个参数 response file fileList
+            :on-remove  图片移除执行的方法 file fileList
+          -->
+          <el-upload
+            :headers="headers"
+            action="http://localhost:8888/api/private/v1/upload"
+            :on-remove="handleRemove"
+            :on-success="handleSuccess"
+            list-type="picture">
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+        </el-tab-pane>
         <el-tab-pane label="商品图片">商品图片</el-tab-pane>
       </el-tabs>
     </el-form>
@@ -124,7 +139,11 @@ export default {
       // 动态参数
       dynamicParams: [],
       // 静态参数
-      staicParams: []
+      staicParams: [],
+      // 设置token
+      headers: {
+        'Authorization': sessionStorage.getItem('token')
+      }
     };
   },
   created() {
@@ -173,7 +192,7 @@ export default {
       // :id 分类id
       // attr_sel [only,many] only-->静态 many --> 动态
       const response = await this.$http.get(`categories/${this.selectedOptions2[2]}/attributes?sel=${sel}`);
-      console.log(response);
+      // console.log(response);
       console.log(sel);
       // 判断如果是动态参数 给动态参数赋值
       if (sel === 'many') {
@@ -191,6 +210,14 @@ export default {
         // 给静态参数赋值
         this.staicParams = response.data.data;
       }
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handleSuccess(response, file, fileList) {
+      console.log(response);
+      console.log(file);
+      console.log(fileList);
     }
   }
 };
