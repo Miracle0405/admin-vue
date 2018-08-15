@@ -16,7 +16,7 @@
         <el-cascader
           expand-trigger="hover"
           :options="options"
-          :props="{ label: 'attr_name', value: 'attr_id'}"
+          :props="{ label: 'cat_name', value: 'cat_id'}"
           v-model="selectedOptions2"
           @change='handleChange'>
         </el-cascader>
@@ -26,7 +26,7 @@
     <!-- 选项卡切换 -->
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="动态参数" name="many">
-        <el-button type="primary">添加动态参数</el-button>
+        <el-button type="primary" :disabled="this.selectedOptions2.length !== 3">添加动态参数</el-button>
         <el-table
           border
           stripe
@@ -67,7 +67,7 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="静态参数" name="only">
-        <el-button type="primary">添加静态参数</el-button>
+        <el-button type="primary" :disabled="this.selectedOptions2.length !== 3">添加静态参数</el-button>
         <el-table
           border
           stripe
@@ -119,11 +119,13 @@ export default {
     };
   },
   created() {
-
+    this.loadData();
   },
   methods: {
     async loadData() {
-      // const response = await this.$http.get()
+      const response = await this.$http.get('categories?type=3');
+      console.log(response);
+      this.options = response.data.data;
     },
     // 多级下拉选中内容改变之后
     handleChange() {
