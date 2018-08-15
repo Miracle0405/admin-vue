@@ -115,13 +115,21 @@ export default {
       // console.log(tab);  index: '1'
       // console.log(event);
       this.active = tab.index - 0;
+
+      // 判断当前点击的tab栏是不是商品参数，商品属性
+      if(tab.index === '1' || tab.index === '2') {
+        // 判断基本信息中的多级菜单是不是选择了3级分类
+        if(this.selectedOptions2.length !== 3) {
+          this.$message.warning('请选择第3级分类');
+        }
+      }
     },
     // 多级下拉选中项变化的时候执行
     handleChange() {
       // 多级下拉只能选中第三项
       if (this.selectedOptions2.length !== 3) {
         // 提示请选择第三级选项
-        this.$message.warning('请选择第三级选项');
+        this.$message.warning('请选择第3级选项');
         // 清空多级下拉框中的内容
         this.selectedOptions2.length = 0;
       }
