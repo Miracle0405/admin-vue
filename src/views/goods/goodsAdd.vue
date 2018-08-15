@@ -103,8 +103,8 @@
           </el-upload>
         </el-tab-pane>
         <el-tab-pane label="商品图片">
-          <el-button type="primary">添加商品</el-button>
-          <quill-editor></quill-editor>
+          <el-button type="primary" @click="handleAdd">添加商品</el-button>
+          <quill-editor v-model="form.goods_introduce"></quill-editor>
         </el-tab-pane>
       </el-tabs>
     </el-form>
@@ -141,7 +141,9 @@ export default {
         goods_cat: '',
         // 记录上传图片的临时路径
         pics: [],
+        // 绑定父文本框的值
         goods_introduce: '',
+        // 绑定添加商品的数组
         attrs: []
       },
       // 绑定下拉框的数据源
@@ -211,7 +213,7 @@ export default {
       // attr_sel [only,many] only-->静态 many --> 动态
       const response = await this.$http.get(`categories/${this.selectedOptions2[2]}/attributes?sel=${sel}`);
       // console.log(response);
-      console.log(sel);
+      // console.log(sel);
       // 判断如果是动态参数 给动态参数赋值
       if (sel === 'many') {
         // 动态参数
@@ -247,10 +249,10 @@ export default {
 
       this.form.pics.splice(index, 1);
 
-      console.log(this.form.pics);
+      // console.log(this.form.pics);
     },
     handleSuccess(response, file, fileList) {
-      console.log(response);
+      // console.log(response);
       // console.log(file);
       // console.log(fileList);
       if (response.meta.status === 200) {
@@ -262,6 +264,36 @@ export default {
         });
       } else {
         this.$message.warning(response.meta.msg);
+      }
+    },
+    // 点击添加按钮时 添加商品
+    async handleAdd() {
+      // goods_cat
+      this.form.goods_cat = this.selectedOptions2.join(',');
+
+      // 基于dynamicParams生成的一个新数组
+      const arr1 = this.dynamicParams.map((item) => {
+        return { 'attr_id': item.attr_id, 'attr_value': item.params.join(',') };
+      });
+
+      // 基于静态staicParams生成的一个数组
+      const arr2 = this.staicParams.map((item) => {
+        return { 'attr_id': item.attr_id, 'attr_value': item.attr_vals };
+      });
+
+      this.form.attrs = [...arr1, ...arr2];
+
+      // console.log(this.form.goods_cat);
+      const response1 = await this.$http.post('goods', this.form);
+      console.log(response1);
+      const { meta: { msg, status } } = response1.data;
+      if (status === 201) {
+        // 添加成功 跳转到商品列表
+        this.$router.push('/goods');
+
+        this.$message.success(msg);
+      } else {
+        this.$message.error(msg);
       }
     }
   }
