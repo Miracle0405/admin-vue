@@ -42,6 +42,17 @@
                 @close="handleClose(item, scope.row)">
                 {{ item }}
               </el-tag>
+              <!-- 动态编辑标签 -->
+              <el-input
+                class="input-new-tag"
+                v-if="inputVisible"
+                v-model="inputValue"
+                ref="saveTagInput"
+                size="small"
+                @keyup.enter.native="handleInputConfirm(scope.row)"
+                @blur="handleInputConfirm(scope.row)">
+              </el-input>
+              <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
             </template>
           </el-table-column>
           <el-table-column
@@ -121,7 +132,11 @@ export default {
       // tab绑定的数据
       activeName: 'many',
       // 表格绑定的数据
-      data: []
+      data: [],
+      // 动态编辑文本框的显示隐藏
+      inputVisible: false,
+      // 绑定动态文本框的值
+      inputValue: ''
     };
   },
   created() {
@@ -175,12 +190,49 @@ export default {
       });
       param.params.splice(index, 1);
       // console.log(param);
+    },
+    // 点击按钮时显示文本框
+    showInput() {
+      this.inputVisible = true;
+      // 下次dom更新时使文本框获取焦点
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+    handleInputConfirm() {
+      // 获取文本框的值 发送请求
+      let inputValue = this.inputValue;
+      if(!inputValue) {
+        return;
+      }
+      row.params.push(inputValue);
+
+      this.inputVisible = false;
+      this.inputValue = '';
+
+      // if (inputValue) {
+      //   this.dynamicTags.push(inputValue);
+      // }
+      // this.inputVisible = false;
+      // this.inputValue = '';
     }
   }
 };
 </script>
 
 <style>
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.input-new-tag {
+  width: 90px;
+  margin-left: 10px;
+  vertical-align: bottom;
+}
 .el-tag + .el-tag {
   margin-left: 10px;
 }
