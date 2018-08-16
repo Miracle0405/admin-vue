@@ -199,17 +199,29 @@ export default {
         this.$refs.saveTagInput.$refs.input.focus();
       });
     },
-    handleInputConfirm() {
+    async handleInputConfirm(row) {
       // 获取文本框的值 发送请求
       let inputValue = this.inputValue;
-      if(!inputValue) {
+      if (!inputValue) {
         return;
       }
       row.params.push(inputValue);
 
-      this.inputVisible = false;
-      this.inputValue = '';
+      const response = await this.$http.put(`categories/${this.selectedOptions2[2]}/attributes/${row.attr_id}`, {
+        attr_vals: row.params.join(','),
+        attr_name: row.attr_name,
+        attr_sel: this.activeName
+      });
 
+      console.log(response);
+      const { meta: { msg, status } } = response.data;
+      if (status === 200) {
+        this.inputVisible = false;
+        this.inputValue = '';
+        this.$message.success(msg);
+      } else {
+        this.$message.error(msg);
+      }
       // if (inputValue) {
       //   this.dynamicTags.push(inputValue);
       // }
