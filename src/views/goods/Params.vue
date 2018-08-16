@@ -146,7 +146,7 @@ export default {
     // 加载多级下拉的数据
     async loadOptions() {
       const response = await this.$http.get('categories?type=3');
-      console.log(response);
+      // console.log(response);
       this.options = response.data.data;
     },
     // 多级下拉选中内容改变之后

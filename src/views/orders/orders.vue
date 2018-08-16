@@ -114,7 +114,8 @@ export default {
       pagenum: 1,
       pagesize: 5,
       total: 0,
-      addOpenDialogFormVisible: false
+      addOpenDialogFormVisible: false,
+      options: []
     };
   },
   created() {
@@ -123,14 +124,17 @@ export default {
   methods: {
     async loadData() {
       const response = await this.$http.get(`orders?pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
-      console.log(response);
-      const { meta: { msg, status } } = response.data;
-      if (status === 200) {
-        this.tableData = response.data.data.goods;
-        this.total = response.data.data.total;
-      } else {
-        this.$message.error(msg);
-      }
+
+      this.tableData = response.data.data.goods;
+
+      this.total = response.data.data.total;
+      // console.log(response);
+      // const { meta: { msg, status } } = response.data;
+      // if (status === 200) {
+
+      // } else {
+      //   this.$message.error(msg);
+      // }
     },
     handleSizeChange(val) {
       this.pagesize = val;
