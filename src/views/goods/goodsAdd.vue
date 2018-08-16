@@ -285,7 +285,7 @@ export default {
 
       // console.log(this.form.goods_cat);
       const response1 = await this.$http.post('goods', this.form);
-      console.log(response1);
+      // console.log(response1);
       const { meta: { msg, status } } = response1.data;
       if (status === 201) {
         // 添加成功 跳转到商品列表

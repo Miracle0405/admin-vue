@@ -24,7 +24,7 @@
     </el-row>
 
     <!-- 选项卡切换 -->
-    <el-tabs v-model="activeName" @tab-click="handleClick">
+    <el-tabs v-model="activeName" @tab-click="handleTabClick">
       <el-tab-pane label="动态参数" name="many">
         <el-button type="primary" :disabled="this.selectedOptions2.length !== 3">添加动态参数</el-button>
         <el-table
@@ -34,8 +34,14 @@
           style="width: 100%">
           <el-table-column
             type="expand">
-            <template slot-scope="scope">
-              demo
+             <template slot-scope="scope">
+              <el-tag
+                :key="item"
+                v-for="item in scope.row.params"
+                closable
+                @close="handleClose(item, scope.row)">
+                {{ item }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column
@@ -119,22 +125,63 @@ export default {
     };
   },
   created() {
-    this.loadData();
+    this.loadOptions();
   },
   methods: {
-    async loadData() {
+    // 加载多级下拉的数据
+    async loadOptions() {
       const response = await this.$http.get('categories?type=3');
       console.log(response);
       this.options = response.data.data;
     },
     // 多级下拉选中内容改变之后
     handleChange() {
+      this.loadData();
+    },
+    handleTabClick() {
+      this.loadData();
+    },
+    // 加载表格数据
+    async loadData() {
+      // this.data.length = 0;
+      if (this.selectedOptions2.length === 3) {
+        const response = await this.$http.get(`categories/${this.selectedOptions2[2]}/attributes?sel=${this.activeName}`);
+        // console.log(response);
+        const { meta: { msg, status } } = response.data;
 
+        if (status === 200) {
+          this.data = response.data.data;
+
+          if (this.activeName === 'many') {
+            this.data.forEach((item) => {
+              // 动态给对象添加成员
+              const arr = item.attr_vals.length === 0 ? [] : item.attr_vals.split(',');
+
+              this.$set(item, 'params', arr);
+            });
+          }
+          // this.$message.success(msg);
+        } else {
+          this.$message.error(msg);
+        }
+      }
+    },
+    // 点击关闭
+    handleClose(tag, param) {
+      const index = param.params.findIndex((item) => {
+        if (tag === item) {
+          return true;
+        }
+      });
+      param.params.splice(index, 1);
+      // console.log(param);
     }
   }
 };
 </script>
 
 <style>
-
+.el-tag + .el-tag {
+  margin-left: 10px;
+}
 </style>
