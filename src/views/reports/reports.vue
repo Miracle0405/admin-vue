@@ -13,34 +13,43 @@
 import echarts from 'echarts';
 export default {
   data() {
-
+    return {
+    };
   },
   // dom挂载到vue实例上后
   mounted() {
     this.init();
   },
   methods: {
-    init() {
+    async init() {
       // 初始化echarts
       const myCharts = echarts.init(this.$refs.chart);
-      const option = {
+
+      const response = await this.$http.get('reports/type/1');
+      // console.log(response);
+      let option = response.data.data;
+      const data = {
         title: {
-          text: 'ECharts 入门示例'
+          text: '用户来源'
         },
-        tooltip: {},
-        legend: {
-          data:['销量']
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            label: {
+              backgroundColor: '#6a7985'
+            }
+          }
         },
-        xAxis: {
-          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
-        },
-        yAxis: {},
-        series: [{
-          name: '销量',
-          type: 'bar',
-          data: [5, 20, 36, 10, 10, 20]
-        }]
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
+        }
       };
+
+      option = { ...data, ...option };
+      option.xAxis[0].boundaryGap = false;
       myCharts.setOption(option);
     }
   }
