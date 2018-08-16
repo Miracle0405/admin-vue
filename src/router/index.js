@@ -19,6 +19,8 @@ import Shops from '@/views/goods/Shop';
 import { Message } from 'element-ui';
 // 导入商品列表添加商品的组件
 import AddGoods from '@/views/goods/goodsAdd';
+// 导入订单列表组件
+import Orders from '@/views/orders/orders';
 
 // @代表的是src的绝对路径
 // @是在build/webpack.base.conf.js
@@ -41,7 +43,8 @@ const router = new Router({
         { name: 'goods', path: '/goods', component: Goods },
         { name: 'goodsadd', path: '/goods/add', component: AddGoods },
         { name: 'params', path: '/params', component: Params },
-        { name: 'categories', path: '/categories', component: Shops }
+        { name: 'categories', path: '/categories', component: Shops },
+        { name: 'orders', path: '/orders', component: Orders }
       ]
     }
   ]
